@@ -70,7 +70,7 @@ class Command(object):
             "stdin": subprocess.PIPE,
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
-            "shell": True,
+            "shell": False,
             "universal_newlines": True,
             "bufsize": 0,
         }
@@ -179,6 +179,10 @@ class Command(object):
         if self.blocking:
             popen_kwargs = self._default_popen_kwargs.copy()
             popen_kwargs["universal_newlines"] = not binary
+
+            if isinstance(self._popen_args, STR_TYPES):
+                popen_kwargs["shell"] = True
+
             if cwd:
                 popen_kwargs["cwd"] = cwd
             if env:
@@ -187,6 +191,10 @@ class Command(object):
         # Otherwise, use pexpect.
         else:
             pexpect_kwargs = self._default_pexpect_kwargs.copy()
+
+            if isinstance(self._popen_args, STR_TYPES):
+                pexpect_kwargs["shell"] = True
+
             if binary:
                 pexpect_kwargs["encoding"] = None
             if cwd:
